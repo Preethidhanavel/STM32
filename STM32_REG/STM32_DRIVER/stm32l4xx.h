@@ -1,9 +1,4 @@
-/*
- * stm32l4xx.h
- *
- *  Created on: Jul 31, 2025
- *      Author: VINOTH
- */
+
 
 #ifndef INC_STM32L4XX_H_
 #define INC_STM32L4XX_H_
