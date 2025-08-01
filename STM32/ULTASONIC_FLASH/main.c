@@ -51,8 +51,6 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t tx_data[4] = { 'A', 'B', 'C', 'D' };
-uint8_t rx_data[4];
 uint32_t ic_val1 = 0;
 uint32_t ic_val2 = 0;
 uint32_t diff = 0;
@@ -83,11 +81,6 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void send_uart(char *string)
-{
-	uint8_t len=strlen(string);
-	HAL_UART_Transmit(&huart2,(uint8_t*)string,len,2000);
-}
 
 void HCSR04_Trigger(void)
 {
@@ -166,100 +159,72 @@ int main(void)
   MX_SPI1_Init();
   MX_RTC_Init();
   MX_TIM2_Init();
-
-  if ((RTC->ISR & RTC_ISR_INITS) == 0)
-      {
-        send_uart("RTC not yet initialized. Setting time and date...\r\n");
-
-        sTime.Hours = 11;
-        sTime.Minutes = 35;
-        sTime.Seconds = 00;
-        sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-        sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-        HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-
-        sDate.WeekDay = RTC_WEEKDAY_FRIDAY;
-        sDate.Month = RTC_MONTH_JULY;
-        sDate.Date = 29;
-        sDate.Year = 25;
-        HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-      }
   /* USER CODE BEGIN 2 */
   W25QXX_Init(&hspi1);
 
-    // Write data to address 0x000100
-    W25QXX_Write(0x000100, tx_data, 4);
-
-    HAL_Delay(100);
-
-    // Read data from address 0x000100
-    W25QXX_Read(0x000100, rx_data, 4);
-
-    // Print to UART (optional)
-    char msg1[32];
-    snprintf(msg1, sizeof(msg1), "Read: %c %c %c %c\r\n", rx_data[0], rx_data[1], rx_data[2], rx_data[3]);
-    HAL_UART_Transmit(&huart2, (uint8_t*)msg1, strlen(msg1), HAL_MAX_DELAY);
 
   /* USER CODE END 2 */
+    uint8_t current_address=(uint8_t)0X000100;
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-	  HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-	  HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);  // Must be called right after time
+        /* Infinite loop */
+        /* USER CODE BEGIN WHILE */
+        while (1)
+        {
+          /* USER CODE END WHILE */
+      	  HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+      	  HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);  // Must be called right after time
 
-	 snprintf(timestamp, sizeof(timestamp), "%02d:%02d:%02d",sTime.Hours, sTime.Minutes, sTime.Seconds);
-	 Start_HCSR04();
+      	 snprintf(timestamp, sizeof(timestamp), "%02d:%02d:%02d",sTime.Hours, sTime.Minutes, sTime.Seconds);
+      	 Start_HCSR04();
 
-	 char buffer[50];
-	 uint8_t rx_data1[70];
-	 char tx_data1[70];
-	 snprintf(buffer, sizeof(buffer), "Distance: %.2f cm\r\n", distance_cm);
-	 HAL_UART_Transmit(&huart2, (uint8_t*)buffer, strlen(buffer), 2000);
-	 HAL_Delay(2000);
+      	 char buffer[50];
+      	 uint8_t rx_data1[70];
+      	 char tx_data1[70];
+      	 snprintf(buffer, sizeof(buffer), "Distance: %.2f cm\r\n", distance_cm);
+      	 HAL_UART_Transmit(&huart2, (uint8_t*)buffer, strlen(buffer), 2000);
+      	 HAL_Delay(2000);
 
-	 	     if (distance_cm < THRESHOLD_CM)
-	 	    	 object_present = 1;
-	 	     else
-	 	    	  object_present = 0;
+      	 	     if (distance_cm < THRESHOLD_CM)
+      	 	    	 object_present = 1;
+      	 	     else
+      	 	    	  object_present = 0;
 
-	 	    	     if (object_present && !object_previous)
-	 	    	     {
-	 	    	        // HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_SET);  // Optional LED
-	 	    	         snprintf(tx_data1, sizeof(tx_data1), "IN[%s]: %.2f cm\r\n", timestamp, distance_cm);
-	 	    	         W25QXX_Write(0x000100, tx_data1, 4);
-	 	    	         HAL_UART_Transmit(&huart2, (uint8_t*)tx_data1, strlen(tx_data1), HAL_MAX_DELAY);
-	 	    	         HAL_Delay(100);
-	 	    	         W25QXX_Read(0x000100, rx_data1, 11);
-	 	    	         char msg1[32];
-	 	    	         snprintf(msg1, sizeof(msg1), "Read1: %c%c%c%c%c%c%c%c%c%c%c\r\n", rx_data1[0], rx_data1[1],
-	 	    	        		 rx_data1[2], rx_data1[3],rx_data1[4],rx_data1[5],rx_data1[6],rx_data1[7],rx_data1[8],rx_data1[9],rx_data1[10]);
-	 	    	         HAL_UART_Transmit(&huart2, (uint8_t*)msg1, strlen(msg1), HAL_MAX_DELAY);
+      	 	    	     if (object_present && !object_previous)
+      	 	    	     {
+      	 	    	         snprintf(tx_data1, sizeof(tx_data1), "IN [%s]: %.2f cm\r\n", timestamp, distance_cm);
+      	 	    	         W25QXX_Write(current_address,(uint8_t*)tx_data1,strlen(tx_data1));
+      	 	    	         HAL_UART_Transmit(&huart2, (uint8_t*)tx_data1, strlen(tx_data1), HAL_MAX_DELAY);
+      	 	    	         HAL_Delay(100);
+      	 	    	         W25QXX_Read(current_address, rx_data1, 13);
+      	 	    	         HAL_UART_Transmit(&huart2, (uint8_t*)"W25Qxx write success",20, HAL_MAX_DELAY);
+      	 	    	         char msg1[32];
+      	 	    	         snprintf(msg1, sizeof(msg1), "Read f %c%c%c%c%c%c%c%c%c%c%c%c%c\r\n", rx_data1[0], rx_data1[1],
+      	 	    	        		 rx_data1[2], rx_data1[3],rx_data1[4],rx_data1[5],rx_data1[6],rx_data1[7],rx_data1[8],rx_data1[9],rx_data1[10],rx_data1[11],rx_data1[12]);
+      	 	    	         HAL_UART_Transmit(&huart2, (uint8_t*)msg1, strlen(msg1), HAL_MAX_DELAY);
+      	 	    	         current_address += strlen(tx_data1);  // Move to next available address
 
-	 	    	     }
-	 	    	     else if (!object_present && object_previous)
-	 	    	     {
-	 	    	        // HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_RESET);  // Optional LED
-	 	    	        snprintf(tx_data1, sizeof(tx_data1), "OUT TIME [%s]: %.2f cm\r\n", timestamp, distance_cm);
-	 	    	        W25QXX_Write(0x000100, tx_data1, 4);
-	 	    	       	HAL_UART_Transmit(&huart2, (uint8_t*)tx_data1, strlen(tx_data1), HAL_MAX_DELAY);
-	 	    	       	HAL_Delay(100);
-	 	    	       	W25QXX_Read(0x000100, rx_data1, 11);
-	 	    	       	char msg1[32];
-	 	    	        snprintf(msg1, sizeof(msg1), "Read1: %c%c%c%c%c%c%c%c%c%c%c\r\n", rx_data1[0], rx_data1[1],
-	 	    	 	    	        		 rx_data1[2], rx_data1[3],rx_data1[4],rx_data1[5],rx_data1[6],rx_data1[7],rx_data1[8],rx_data1[9],rx_data1[10]);
-	 	    	       HAL_UART_Transmit(&huart2, (uint8_t*)msg1, strlen(msg1), HAL_MAX_DELAY);
-	 	    	     }
+      	 	    	     }
+      	 	    	     else if (!object_present && object_previous)
+      	 	    	     {
+      	 	    	        snprintf(tx_data1, sizeof(tx_data1), "OUT [%s]: %.2f cm\r\n", timestamp, distance_cm);
+      	 	    	        W25QXX_Write(current_address,(uint8_t*)tx_data1,strlen(tx_data1));
+      	 	    	       	HAL_Delay(100);
+      	 	    	        HAL_UART_Transmit(&huart2, (uint8_t*)"W25Qxx write success", 20, HAL_MAX_DELAY);
+      	 	    	       	W25QXX_Read(current_address, rx_data1, 13);
+      	 	    	       	char msg1[32];
+      	 	    	        snprintf(msg1, sizeof(msg1), "Read f %c%c%c%c%c%c%c%c%c%c%c%c%c\r\n", rx_data1[0], rx_data1[1],
+      	 	    	 	    	        		 rx_data1[2], rx_data1[3],rx_data1[4],rx_data1[5],rx_data1[6],rx_data1[7],rx_data1[8],rx_data1[9],rx_data1[10],rx_data1[11],rx_data1[12]);
+      	 	    	        HAL_UART_Transmit(&huart2, (uint8_t*)msg1, strlen(msg1), HAL_MAX_DELAY);
+      	 	    	        current_address += strlen(tx_data1);  // Move to next available address
+      	 	    	     }
 
-	 	    	     object_previous = object_present;
+      	 	    	     object_previous = object_present;
 
 
-	 	    HAL_Delay(100);  // Sampling interval
+      	 	    HAL_Delay(100);  // Sampling interval
 
-    /* USER CODE BEGIN 3 */
-  }
+          /* USER CODE BEGIN 3 */
+        }
   /* USER CODE END 3 */
 }
 
@@ -436,7 +401,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 79;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 4294967295;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -519,6 +484,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
@@ -526,6 +494,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PC4 */
   GPIO_InitStruct.Pin = GPIO_PIN_4;
