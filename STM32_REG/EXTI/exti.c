@@ -22,6 +22,8 @@
  *
  */
 #include<stdint.h>
+#include<string.h>
+#include<stdio.h>
 #include"stm32l4xx.h"
 #include"stm32l4xx_gpio_driver.h"
 
@@ -33,14 +35,15 @@ int main(void)
 {
     /* Loop forever */
 	GPIO_Handle_t GpioLed, GpioBtn;
+	memset(&GpioLed,0,sizeof(GpioLed));
+	memset(&GpioBtn,0,sizeof(GpioBtn));
 	GpioLed.pGPIOx =GPIOA;
 	GpioLed.GPIO_PinConfig.GPIO_PinNumber =GPIO_PIN_NO_5;
 	GpioLed.GPIO_PinConfig.GPIO_PinMode=GPIO_MODE_OUT;
 	GpioLed.GPIO_PinConfig.GPIO_PinSpeed=GPIO_SPEED_FAST;
 	GpioLed.GPIO_PinConfig.GPIO_PinOPType=GPIO_OP_TYPE_PP;  // OUTPUT is configure as push-pull
-	//GpioLed.GPIO_PinConfig.GPIO_PinOPType=GPIO_OP_TYPE_OD;    // OUTPUT is configured as open-drain
-	GpioLed.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_NO_PUPD;
-	//GpioLed.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_PIN_PU;
+	//GpioLed.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_NO_PUPD;
+	GpioLed.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_PIN_PU;
 	GPIO_PeriClockControl(GPIOA, ENABLE);
 	GPIO_Init(&GpioLed);
 
@@ -49,17 +52,19 @@ int main(void)
 	GpioBtn.GPIO_PinConfig.GPIO_PinMode=GPIO_MODE_IT_FT;
 	GpioBtn.GPIO_PinConfig.GPIO_PinSpeed=GPIO_SPEED_FAST;
 	GpioBtn.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_PIN_PU;
-
+	//GpioBtn.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_NO_PUPD;
 	GPIO_PeriClockControl(GPIOC, ENABLE);
 	GPIO_Init(&GpioBtn);
 	GPIO_PRIORITY_CONFIG(IRQ_NO_EXTI15_10, 15);
 	GPIO_IRQInterruptConfig(IRQ_NO_EXTI15_10, ENABLE);
-	while(1)
-	{
-		   GPIO_IRQHandling(GPIO_PIN_NO_13);
-			GPIO_ToggleOutputPin(GPIOA, GPIO_PIN_NO_5);
 
-	}
-
+	while(1);
 }
 
+void EXTI15_10_IRQHandler(void)
+{
+
+	GPIO_IRQHandling(GPIO_PIN_NO_13);
+	GPIO_ToggleOutputPin(GPIOA, GPIO_PIN_NO_5);
+	delay();
+}

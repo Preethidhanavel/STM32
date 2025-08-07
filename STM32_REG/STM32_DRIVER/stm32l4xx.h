@@ -4,15 +4,17 @@
 #define INC_STM32L4XX_H_
 
 #include<stdint.h>
+#include<stddef.h>
+#define    __vo    volatile
 
-#define __vo volatile
 /*base address*/
-
 #define FLASH_BASE_ADDR				0x08000000UL
 #define SRAM1_BASE_ADDR				0x20000000UL
 #define SRAM2_BASE_ADDR				0x10000000
 #define ROM							0x1FFF0000
 #define SRAM 						SRAM1_BASE_ADDR
+/*end*/
+
 
 /* peripheral bus base address*/
 #define PERIPHER_BASE				 0x40000000UL
@@ -20,6 +22,7 @@
 #define AHB2_BASE_ADDR				 0x48000000UL
 #define APB1_BASE_ADDR				 PERIPHER_BASE
 #define APB2_BASE_ADDR				 0x40010000UL
+/*end*/
 
 /*peripheral base address on AHB2 bus*/
 #define GPIOA_BASE_ADDR				 (AHB2_BASE_ADDR + 0X0000)
@@ -30,11 +33,11 @@
 #define GPIOF_BASE_ADDR				 (AHB2_BASE_ADDR + 0X1400)
 #define GPIOG_BASE_ADDR				 (AHB2_BASE_ADDR + 0X1800)
 #define GPIOH_BASE_ADDR				 (AHB2_BASE_ADDR + 0X1C00)
-
 #define OTG_FS_BASE_ADDR			 0x50000000UL
 #define ADC_BASE_ADDR				 0x50040000UL
 #define AES_BASE_ADDR				 0x50060000UL
 #define RNG_BASE_ADDR				 0x50060800UL
+/*end*/
 
 /*base address of peripheral on AHB1 bus*/
 #define DMA1_BASE_ADDR				 (AHB1_BASE_ADDR + 0X0000)
@@ -186,6 +189,28 @@ typedef struct{
 	__vo uint32_t SWPR2;
 
 }SYSCFG_RegDef_t;
+/*end*/
+
+/*uart deefitniton*/
+typedef struct{
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t CR3;
+	__vo uint32_t BRR;
+	__vo uint32_t GTPR;
+//	uint16_t res0;
+	__vo uint32_t RTQR;
+	__vo uint32_t RQR;
+	//uint16_t res1;
+	__vo uint32_t ISR;
+	__vo uint32_t ICR;
+	__vo uint32_t RDR;
+	//uint16_t res2;
+	__vo uint32_t TDR;
+//	uint16_t res3;
+}USART_RegDef_t;
+/*end of structure definition*/
+
 /*GPIO peripheral definition*/
 #define GPIOA 						((GPIO_Regdef_t *)GPIOA_BASE_ADDR)
 #define GPIOB 						((GPIO_Regdef_t *)GPIOB_BASE_ADDR)
@@ -196,11 +221,21 @@ typedef struct{
 #define GPIOG 						((GPIO_Regdef_t *)GPIOG_BASE_ADDR)
 #define GPIOH 						((GPIO_Regdef_t *)GPIOH_BASE_ADDR)
 /* end of GPIO definition*/
+
 /* RCC peripheral definition*/
 #define RCC							((RCC_Regdef_t *)RCC_BASE_ADDR)
 /*end of peripheral definiton*/
+
+/*register mapping*/
 #define EXTI						((EXTI_RegDef_t *)EXTI_BASE_ADDR)
 #define SYSCFG                      ((SYSCFG_RegDef_t *)SYSCFG_BASE_ADDR)
+#define USART1						((USART_RegDef_t *)USART1_BASE_ADDR)
+#define USART2                      ((USART_RegDef_t *)USART2_BASE_ADDR)
+#define USART3						((USART_RegDef_t *)USART3_BASE_ADDR)
+#define UART4						((USART_RegDef_t *)UART4_BASE_ADDR)
+#define UART5						((USART_RegDef_t *)UART5_BASE_ADDR)
+/*register mapping */
+
 /*clock enable for GPIO peripheral*/
 #define GPIOA_PCLK_EN()             (RCC -> AHB2ENR |= 1<<0)
 #define GPIOB_PCLK_EN()             (RCC -> AHB2ENR |= 1<<1)
@@ -233,9 +268,7 @@ typedef struct{
 /*end of uart clk enable*/
 
 /* clock enable for SYSCFG  */
-
 #define SYSCFG_PCLK_EN()           (RCC -> APB2ENR |=1<<0)
-
 /* end of SYSCFG clk enable*/
 
 /*clock disable for GPIO peripheral*/
@@ -249,7 +282,7 @@ typedef struct{
 #define GPIOH_PCLK_DI()             (RCC -> AHB2ENR &= ~(1<<7))
 /*end of GPIO clk disable*/
 
-/*peripheral clokc reset */
+/*GPIO peripheral clokc reset */
 #define GPIOA_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<0)); RCC -> AHB2RSTR &= ~(1<<0);}while(0)
 #define GPIOB_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<1)); RCC -> AHB2RSTR &= ~(1<<1);}while(0)
 #define GPIOC_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<2)); RCC -> AHB2RSTR &= ~(1<<2);}while(0)
@@ -258,7 +291,10 @@ typedef struct{
 #define GPIOF_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<5)); RCC -> AHB2RSTR &= ~(1<<5);}while(0)
 #define GPIOG_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<6)); RCC -> AHB2RSTR &= ~(1<<6);}while(0)
 #define GPIOH_REG_RESET()			do{(RCC -> AHB2RSTR |= (1<<7)); RCC -> AHB2RSTR &= ~(1<<7);}while(0)
-/*end of pclk reset */
+/*end of GPIO pclk reset */
+
+
+/*GPIO port selection*/
 #define GPIO_BASEADDR_TO_CODE(x)    (x==GPIOA) ?0 :\
 									(x==GPIOB) ?1 :\
 									(x==GPIOC) ?2 :\
@@ -267,6 +303,8 @@ typedef struct{
 									(x==GPIOF) ?5 :\
 									(x==GPIOG) ?6 :\
 									(x==GPIOH) ?7 :0
+/*GPIO port selection*/
+
 
 /* Clock disable for I2C peripheral*/
 #define I2C1_PCLK_DI()             (RCC -> APB1ENR  &= ~(1<<21))
@@ -288,47 +326,112 @@ typedef struct{
 #define UART5_PCLK_DI()		       (RCC -> APB1ENR1 &= ~(1<<20))
 /*end of uart clk disable*/
 
+
+/*uart bit macros starts*/
+#define USART_CR1_UE 					0
+#define USART_CR1_UESM 					1
+#define USART_CR1_RE  					2
+#define USART_CR1_TE 					3
+#define USART_CR1_IDLEIE 				4
+#define USART_CR1_RXNEIE  				5
+#define USART_CR1_TCIE					6
+#define USART_CR1_TXEIE					7
+#define USART_CR1_PEIE 					8
+#define USART_CR1_PS 					9
+#define USART_CR1_PCE 					10
+#define USART_CR1_WAKE  				11
+#define USART_CR1_M 					12
+#define USART_CR1_OVER8  				15
+
+#define USART_CR2_ADD   				4
+#define USART_CR2_LBDL   				5
+#define USART_CR2_LBDIE  				6
+#define USART_CR2_LBCL   				8
+#define USART_CR2_CPHA   				9
+#define USART_CR2_CPOL   				10
+#define USART_CR2_STOP   				12
+#define USART_CR2_LINEN   				14
+
+#define USART_CR3_EIE					0
+#define USART_CR3_IREN					1
+#define USART_CR3_IRLP					2
+#define USART_CR3_HDSEL					3
+#define USART_CR3_NACK					4
+#define USART_CR3_SCEN					5
+#define USART_CR3_DMAR					6
+#define USART_CR3_DMAT					7
+#define USART_CR3_RTSE					8
+#define USART_CR3_CTSE					9
+#define USART_CR3_CTSIE					10
+#define USART_CR3_ONEBIT				11
+
+#define USART_ISR_PE					0
+#define USART_ISR_FE					1
+#define USART_ISR_NF					2
+#define USART_ISR_ORE					3
+#define USART_ISR_IDLE					4
+#define USART_ISR_RXNE					5
+#define USART_ISR_TC					6
+#define USART_ISR_TXE					7
+#define USART_ISR_LBDF					8
+#define USART_ISR_CTSIF					9
+#define USART_ISR_CTS					10
+
+/*USART   BIT macros end*/
+
 /* clock disable for SYSCFG  */
-
-#define SYSCFG_PCLK_DI()           (RCC -> APB2ENR &=~(1<<0))
-
+#define SYSCFG_PCLK_DI()           		(RCC -> APB2ENR &=~(1<<0))
 /* end of SYSCFG clk disable*/
 
 /*macros for enable or disable*/
-#define ENABLE         1
-#define DISABLE        0
-#define SET            ENABLE
-#define RESET          DISABLE
-#define GPIO_PIN_SET   SET
-#define GPIO_PIN_RESET RESET
+#define ENABLE         					1
+#define DISABLE        					0
+#define SET            					ENABLE
+#define RESET          					DISABLE
+#define GPIO_PIN_SET   					SET
+#define GPIO_PIN_RESET 					RESET
+#define FLAG_RESET     					RESET
+#define FLAG_SET 	   					SET
+/*end*/
 
-#define IRQ_NO_EXTI0   6
-#define IRQ_NO_EXTI1   7
-#define IRQ_NO_EXTI2   8
-#define IRQ_NO_EXTI3   9
-#define IRQ_NO_EXTI4   10
-#define IRQ_NO_EXTI9_5   23
-#define IRQ_NO_EXTI15_10   40
+/*EXT  interrupt*/
+#define IRQ_NO_EXTI0   					6
+#define IRQ_NO_EXTI1   					7
+#define IRQ_NO_EXTI2   					8
+#define IRQ_NO_EXTI3   					9
+#define IRQ_NO_EXTI4   					10
+#define IRQ_NO_EXTI9_5   				23
+#define IRQ_NO_EXTI15_10   				40
+
+#define IRQ_NO_USART1	    			37
+#define IRQ_NO_USART2	    			38
+#define IRQ_NO_USART3	    			39
+#define IRQ_NO_UART4	    			52
+#define IRQ_NO_UART5	    			53
+
+/*EXT interrupt line*/
+
+/*NVIC configuration starts */
+#define NVIC_ISER0     					( (__vo uint32_t *) 0xE000E100)
+#define NVIC_ISER1     					( (__vo uint32_t *) 0xE000E104)
+#define NVIC_ISER2     					( (__vo uint32_t *) 0xE000E108)
+#define NVIC_ISER3     					( (__vo uint32_t *) 0xE000E10C)
+#define NVIC_ISER4    		 			( (__vo uint32_t *) 0xE000E110)
+#define NVIC_ISER5     					( (__vo uint32_t *) 0xE000E114)
 
 
-#define NVIC_ISER0     ( (__vo uint32_t *) 0xE000E100)
-#define NVIC_ISER1     ( (__vo uint32_t *) 0xE000E104)
-#define NVIC_ISER2     ( (__vo uint32_t *) 0xE000E108)
-#define NVIC_ISER3     ( (__vo uint32_t *) 0xE000E10C)
-#define NVIC_ISER4     ( (__vo uint32_t *) 0xE000E110)
-#define NVIC_ISER5     ( (__vo uint32_t *) 0xE000E114)
+#define NVIC_ICER0     					( (__vo uint32_t *) 0XE000E180)
+#define NVIC_ICER1     					( (__vo uint32_t *) 0xE000E184)
+#define NVIC_ICER2     					( (__vo uint32_t *) 0xE000E188)
+#define NVIC_ICER3     					( (__vo uint32_t *) 0xE000E18C)
+#define NVIC_ICER4     					( (__vo uint32_t *) 0xE000E190)
+#define NVIC_ICER5     					( (__vo uint32_t *) 0xE000E194)
 
+#define NVIC_PR_BASE_ADDR  				( (__vo uint32_t *)  0xE000E400)
+#define NO_PR_BITS_IMPLEMENTED   		4
 
-#define NVIC_ICER0     ( (__vo uint32_t *) 0XE000E180)
-#define NVIC_ICER1     ( (__vo uint32_t *) 0xE000E184)
-#define NVIC_ICER2     ( (__vo uint32_t *) 0xE000E188)
-#define NVIC_ICER3     ( (__vo uint32_t *) 0xE000E18C)
-#define NVIC_ICER4     ( (__vo uint32_t *) 0xE000E190)
-#define NVIC_ICER5     ( (__vo uint32_t *) 0xE000E194)
+/*NVIC configuration ends*/
 
-#define NVIC_PR_BASE_ADDR  ( (__vo uint32_t *)  0xE000E400)
-
-#define NO_PR_BITS_IMPLEMENTED   4
-
-
+#include"stm32l4xx_gpio_driver.h"
+#include"stm32l4xx_usart_driver.h"
 #endif /* INC_STM32L4XX_H_ */
