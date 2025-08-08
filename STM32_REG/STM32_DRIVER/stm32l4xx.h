@@ -211,6 +211,18 @@ typedef struct{
 }USART_RegDef_t;
 /*end of structure definition*/
 
+/*spi regsiter definiton starts*/
+typedef struct{
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t SR;
+	__vo uint32_t DR;
+	__vo uint32_t CRCPR;
+	__vo uint32_t RXCRCR;
+	__vo uint32_t TXCRCR;
+}SPI_RegDef_t;
+/*SPI Register definiton ends*/
+
 /*GPIO peripheral definition*/
 #define GPIOA 						((GPIO_Regdef_t *)GPIOA_BASE_ADDR)
 #define GPIOB 						((GPIO_Regdef_t *)GPIOB_BASE_ADDR)
@@ -228,12 +240,18 @@ typedef struct{
 
 /*register mapping*/
 #define EXTI						((EXTI_RegDef_t *)EXTI_BASE_ADDR)
+
 #define SYSCFG                      ((SYSCFG_RegDef_t *)SYSCFG_BASE_ADDR)
+
 #define USART1						((USART_RegDef_t *)USART1_BASE_ADDR)
 #define USART2                      ((USART_RegDef_t *)USART2_BASE_ADDR)
 #define USART3						((USART_RegDef_t *)USART3_BASE_ADDR)
 #define UART4						((USART_RegDef_t *)UART4_BASE_ADDR)
 #define UART5						((USART_RegDef_t *)UART5_BASE_ADDR)
+
+#define SPI1						((SPI_RegDef_t *)SPI1_BASE_ADDR)
+#define SPI2						((SPI_RegDef_t *)SPI2_BASE_ADDR)
+#define SPI3						((SPI_RegDef_t *)SPI3_BASE_ADDR)
 /*register mapping */
 
 /*clock enable for GPIO peripheral*/
@@ -409,6 +427,9 @@ typedef struct{
 #define IRQ_NO_UART4	    			52
 #define IRQ_NO_UART5	    			53
 
+#define IRQ_NO_SPI1						35
+#define IRQ_NO_SPI2						36
+#define IRQ_NO_SPI3						51
 /*EXT interrupt line*/
 
 /*NVIC configuration starts */
@@ -433,5 +454,5 @@ typedef struct{
 /*NVIC configuration ends*/
 
 #include"stm32l4xx_gpio_driver.h"
-#include"stm32l4xx_usart_driver.h"
+//#include"stm32l4xx_usart_driver.h"
 #endif /* INC_STM32L4XX_H_ */

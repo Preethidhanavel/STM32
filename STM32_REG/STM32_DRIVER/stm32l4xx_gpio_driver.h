@@ -1,9 +1,4 @@
-/*
- * stm32l4xx_gpio_driver.h
- *
- *  Created on: Aug 1, 2025
- *      Author: VINOTH
- */
+
 
 #ifndef INC_STM32L4XX_GPIO_DRIVER_H_
 #define INC_STM32L4XX_GPIO_DRIVER_H_
