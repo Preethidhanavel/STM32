@@ -40,8 +40,6 @@ uint8_t SPI_Transfer(uint8_t data)
 {
     uint8_t rx;
     SPI_SendData(SPI1, &data,  1);
-    uint8_t rx1=0Xff;
-    SPI_SendData(SPI1,&rx1,1);
     SPI_ReceiveData(SPI1, &rx, 1);
     return rx;
 }
