@@ -95,8 +95,6 @@ int SD_Init(void)
 int SD_ReadBlock(uint8_t *buf, uint32_t block)
 {
     uint8_t token;
-
-    if (cardType == CARD_SDSC)
         block *= 512; 
 
     SD_CS_LOW();
@@ -130,8 +128,6 @@ int SD_ReadBlock(uint8_t *buf, uint32_t block)
 uint8_t SD_WriteBlock(uint8_t *buf, uint32_t block)
 {
     uint8_t response;
-
-    if (cardType == CARD_SDSC)
         block *= 512;
 
     SD_CS_LOW();
