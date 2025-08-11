@@ -92,26 +92,26 @@ int SD_Init(void)
     return 0;
 }
 
-int SD_ReadBlock(uint8_t *buf, uint32_t addr)
+int SD_ReadBlock(uint8_t *buf, uint32_t block)
 {
     uint8_t token;
 
-    SD_CS_LOW();
-    SD_Command(17, addr, 0xFF);
+    if (cardType == CARD_SDSC)
+        block *= 512; 
 
-    if (SD_WaitR1() != 0x00)
-    {
+    SD_CS_LOW();
+    SD_Command(CMD17, block, 0xFF);
+
+    if (SD_WaitR1() != 0x00) {
         SD_CS_HIGH();
         return -1;
     }
 
-    for (int i = 0; i < 1000; i++)
-    {
+    for (int i = 0; i < 1000; i++) {
         token = SPI_Transfer(0xFF);
         if (token == 0xFE) break;
     }
-    if (token != 0xFE)
-    {
+    if (token != 0xFE) {
         SD_CS_HIGH();
         return -2;
     }
@@ -119,7 +119,7 @@ int SD_ReadBlock(uint8_t *buf, uint32_t addr)
     for (int i = 0; i < 512; i++)
         buf[i] = SPI_Transfer(0xFF);
 
-    SPI_Transfer(0xFF);
+    SPI_Transfer(0xFF); 
     SPI_Transfer(0xFF);
 
     SD_CS_HIGH();
@@ -127,30 +127,30 @@ int SD_ReadBlock(uint8_t *buf, uint32_t addr)
     return 0;
 }
 
-uint8_t SD_WriteBlock(uint8_t *buf, uint32_t addr)
+uint8_t SD_WriteBlock(uint8_t *buf, uint32_t block)
 {
     uint8_t response;
 
-    SD_CS_LOW();
-    SD_Command(24, addr, 0xFF);
+    if (cardType == CARD_SDSC)
+        block *= 512;
 
-    if (SD_WaitR1() != 0x00)
-    {
+    SD_CS_LOW();
+    SD_Command(CMD24, block, 0xFF);
+
+    if (SD_WaitR1() != 0x00) {
         SD_CS_HIGH();
         return 1;
     }
 
     SPI_Transfer(0xFE);
-
     for (int i = 0; i < 512; i++)
         SPI_Transfer(buf[i]);
 
-    SPI_Transfer(0xFF);
+    SPI_Transfer(0xFF); 
     SPI_Transfer(0xFF);
 
     response = SPI_Transfer(0xFF);
-    if ((response & 0x1F) != 0x05)
-    {
+    if ((response & 0x1F) != 0x05) {
         SD_CS_HIGH();
         return 2;
     }
