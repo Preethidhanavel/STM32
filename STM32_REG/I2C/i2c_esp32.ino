@@ -19,6 +19,8 @@ void setup() {
   pinMode (LED, OUTPUT);
   digitalWrite(2,HIGH);
   Wire.begin((uint8_t)MY_ADDR, SDA_PIN, SCL_PIN);
+  pinMode(21, INPUT_PULLUP);
+  pinMode(22, INPUT_PULLUP);
   Wire.onReceive(receiveEvent);
   Serial.println("Waiting for data from master");  
 }
