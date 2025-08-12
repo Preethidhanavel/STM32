@@ -95,7 +95,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer,uint32_t Len
 
     while (((pI2CHandle->pI2Cx->ISR >>15)&1));
 
-    I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
+   
     uint32_t cr2 = 0;
     pI2CHandle->pI2Cx->CR2 = (SlaveAddr << 1) |(Len << 16);
 
@@ -105,6 +105,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer,uint32_t Len
     }
 
     pI2CHandle->pI2Cx->CR2 |= cr2;
+	I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
     while (Len > 0)
     {
         while (!(pI2CHandle->pI2Cx->ISR & (1<<0)));
@@ -130,7 +131,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint8_t
 
     while (((pI2CHandle->pI2Cx->ISR >>15)&1)==0);
 
-    I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
+    
     uint32_t cr2 = 0;
        cr2 |= (SlaveAddr << 1);
        cr2 |= (Len << 16);
@@ -141,7 +142,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint8_t
        }
 
        pI2CHandle->pI2Cx->CR2 |= cr2;
-
+	   I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
 
     while (Len > 0)
     {
@@ -217,7 +218,7 @@ uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer, uint32
 		pI2CHandle->TxRxState = I2C_BUSY_IN_TX;
 		pI2CHandle->DevAddr = SlaveAddr;
 		pI2CHandle->Sr = Sr;
-		I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
+		
 		 while (((pI2CHandle->pI2Cx->ISR >>15)&1)==0);
 		 uint32_t cr2 = 0;
 		       cr2 |= (SlaveAddr << 1);
@@ -228,7 +229,7 @@ uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer, uint32
 		           cr2 |= (1<<25);
 		       }
 		       pI2CHandle->pI2Cx->CR2|=cr2;
-
+			   I2C_GenerateStartCondition(pI2CHandle->pI2Cx);
 		       pI2CHandle->pI2Cx->CR1 |= ((1<<1) | (1<<6) | (1<<7));
 	}
 
@@ -246,12 +247,12 @@ uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer,uint
         pI2CHandle->RxSize    = Len;
         pI2CHandle->DevAddr   = SlaveAddr;
         pI2CHandle->Sr        = Sr;
-        pI2CHandle->pI2Cx->CR2 |= (1 << 13);
-
+    
         pI2CHandle->pI2Cx->CR2 = 0;
         pI2CHandle->pI2Cx->CR2 |= (SlaveAddr << 1);
         pI2CHandle->pI2Cx->CR2 |= (Len << 16);
         pI2CHandle->pI2Cx->CR2 |= (1 << 10);
+		pI2CHandle->pI2Cx->CR2 |= (1 << 13);
         if (Sr == 0)
             pI2CHandle->pI2Cx->CR2 |= (1 << 25);
 
@@ -447,5 +448,6 @@ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle)
         I2C_ApplicationEventCallback(pI2CHandle, I2C_ERROR_TIMEOUT);
     }
 }
+
 
 
