@@ -79,5 +79,6 @@ void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx);
 
 /*callback*/
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle,uint8_t AppEv);
-//0x00707CBB timing
+
 #endif /* INC_STM32L4XX_I2C_DRIVER_C_ */
+
