@@ -223,6 +223,21 @@ typedef struct{
 }SPI_RegDef_t;
 /*SPI Register definiton ends*/
 
+/*I2C Register definition*/
+typedef struct{
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t OAR1;
+	__vo uint32_t OAR2;
+	__vo uint32_t TIMINGR;
+	__vo uint32_t TIMEOUTR;
+	__vo uint32_t ISR;
+	__vo uint32_t ICR;
+	__vo uint32_t PECR;
+	__vo uint32_t RXDR;
+	__vo uint32_t TXDR;
+}I2C_RegDef_t;
+
 /*GPIO peripheral definition*/
 #define GPIOA 						((GPIO_Regdef_t *)GPIOA_BASE_ADDR)
 #define GPIOB 						((GPIO_Regdef_t *)GPIOB_BASE_ADDR)
@@ -252,6 +267,10 @@ typedef struct{
 #define SPI1						((SPI_RegDef_t *)SPI1_BASE_ADDR)
 #define SPI2						((SPI_RegDef_t *)SPI2_BASE_ADDR)
 #define SPI3						((SPI_RegDef_t *)SPI3_BASE_ADDR)
+
+#define I2C1                         ((I2C_RegDef_t *)I2C1_BASE_ADDR)
+#define I2C2                         ((I2C_RegDef_t *)I2C2_BASE_ADDR)
+#define I2C3                         ((I2C_RegDef_t *)I2C3_BASE_ADDR)
 /*register mapping */
 
 /*clock enable for GPIO peripheral*/
@@ -266,7 +285,7 @@ typedef struct{
 /*end of GPIO clk enable*/
 
 /* Clock enable for I2C peripheral*/
-#define I2C1_PCLK_EN()             (RCC -> APB1ENR  |= 1<<21)
+#define I2C1_PCLK_EN()             (RCC -> APB1ENR1 |= 1<<21)
 #define I2C2_PCLK_EN()             (RCC -> APB1ENR1 |= 1<<22)
 #define I2C3_PCLK_EN()             (RCC -> APB1ENR1 |= 1<<23)
 /* end of I2C clk enable*/
@@ -325,7 +344,7 @@ typedef struct{
 
 
 /* Clock disable for I2C peripheral*/
-#define I2C1_PCLK_DI()             (RCC -> APB1ENR  &= ~(1<<21))
+#define I2C1_PCLK_DI()             (RCC -> APB1ENR1  &= ~(1<<21))
 #define I2C2_PCLK_DI()             (RCC -> APB1ENR1 &= ~(1<<22))
 #define I2C3_PCLK_DI()             (RCC -> APB1ENR1 &= ~(1<<23))
 /* end of I2C clk disable*/
