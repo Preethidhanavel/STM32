@@ -1,6 +1,6 @@
 #include"stm32l4xx_i2c_driver.h"
 
-/*Init and De-init*/
+
 static void I2C_MasterHandleRXNEInterrupt(I2C_Handle_t *pI2CHandle );
 static void I2C_MasterHandleTXEInterrupt(I2C_Handle_t *pI2CHandle );
 
@@ -75,7 +75,7 @@ void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
 	}
 
 }
-
+/*Init */
 void I2C_Init(I2C_Handle_t *pI2CHandle)
 {
 	uint32_t tempreg=0;
@@ -447,4 +447,5 @@ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle)
         I2C_ApplicationEventCallback(pI2CHandle, I2C_ERROR_TIMEOUT);
     }
 }
+
 
