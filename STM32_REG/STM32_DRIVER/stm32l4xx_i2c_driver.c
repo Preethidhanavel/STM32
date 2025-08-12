@@ -80,7 +80,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 {
 	uint32_t tempreg=0;
 	tempreg |=pI2CHandle->I2C_Config.I2C_ACKControl<<15;
-	pI2CHandle->pI2Cx->CR2=tempreg;
+	pI2CHandle->pI2Cx->CR2 |=tempreg;
 
 	pI2CHandle->pI2Cx->TIMINGR |= 0x00411313;  // 100kHz
 
@@ -97,7 +97,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer,uint32_t Len
 
    
     uint32_t cr2 = 0;
-    pI2CHandle->pI2Cx->CR2 = (SlaveAddr << 1) |(Len << 16);
+    pI2CHandle->pI2Cx->CR2 |= (SlaveAddr << 1) |(Len << 16);
 
     if (Sr == I2C_DISABLE_SR)
     {
@@ -448,6 +448,7 @@ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle)
         I2C_ApplicationEventCallback(pI2CHandle, I2C_ERROR_TIMEOUT);
     }
 }
+
 
 
 
