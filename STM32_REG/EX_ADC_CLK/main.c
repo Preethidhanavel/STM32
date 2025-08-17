@@ -1,3 +1,5 @@
+/*The program configures and enables the ADC peripheral by turning on its clock and setting its control register.*/
+
 /**
  ******************************************************************************
  * @file           : main.c
@@ -18,24 +20,37 @@
 
 #include <stdint.h>
 
+// Warning if using FPU (Floating Point Unit) but it's not initialized
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
+
+// Base address of ADC peripheral
 #define ADC_BASE_ADDR  0X50040000UL
+// Offset for ADC control register (CR)
 #define ADC_CR_REG_OFFSET 0X08UL
+// Full address of ADC control register
 #define ADC_CR_REG_ADDR (ADC_BASE_ADDR+ADC_CR_REG_OFFSET)
 
+// Base address of RCC peripheral
 #define RCC_BASE_ADDR 0X40021000UL
+// Offset for AHB2 peripheral clock enable register
 #define RCC_AHB2_ENR_OFFSET 0X4CUL
+// Full address of RCC AHB2 enable register
 #define RCC_AHB2_ENR_ADDR (RCC_BASE_ADDR+RCC_AHB2_ENR_OFFSET)
 
 int main(void)
 {
+    // Pointer to ADC control register
 	uint32_t *pAdcCrReg= (uint32_t *)ADC_CR_REG_ADDR;
+    // Pointer to RCC AHB2 peripheral clock enable register
 	uint32_t *pRccAhb2Enr=(uint32_t *)RCC_AHB2_ENR_ADDR;
 
-	*pRccAhb2Enr|=1<<13;
-	*pAdcCrReg|=1<<3;
-	/* Loop forever */
+    // Enable clock for ADC (bit 13 of AHB2ENR)
+	*pRccAhb2Enr |= 1 << 13;
+    // Enable ADC (set bit 3 of ADC_CR)
+	*pAdcCrReg |= 1 << 3;
+
+	/* Infinite loop */
 	for(;;);
 }

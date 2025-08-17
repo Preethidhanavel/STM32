@@ -6,32 +6,37 @@
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2025 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
+ * This example demonstrates polling a memory location in SRAM1 until a non-zero
+ * value is detected.
  *
  ******************************************************************************
  */
 
 #include <stdint.h>
 
+// FPU warning if compiling for hardware floating point but FPU not initialized
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
+
+// Base address of SRAM1 in STM32
 #define SRAM1_ADDR        0x20000000UL
+
 int main(void)
 {
-	uint32_t value=0;
-	uint32_t *p=(uint32_t *) SRAM1_ADDR;
-	while(1)
-	{
-		value=*p;
-		if(value)
-			break;
-	}
-	while(1);
+    uint32_t value = 0;                // Variable to store value read from SRAM
+    uint32_t *p = (uint32_t *)SRAM1_ADDR;  // Pointer to SRAM1 base address
+
+    // Infinite loop to poll SRAM location
+    while(1)
+    {
+        value = *p;     // Read value from SRAM
+        if(value)       // Check if non-zero
+            break;      // Exit loop if non-zero value is found
+    }
+
+    // Infinite loop to halt execution after detecting non-zero value
+    while(1);
+
     return 0;
 }
