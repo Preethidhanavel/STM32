@@ -238,6 +238,56 @@ typedef struct{
 	__vo uint32_t TXDR;
 }I2C_RegDef_t;
 
+
+/*ADC register definiton*/
+typedef struct{
+	__vo uint32_t ISR;
+	__vo uint32_t IER;
+	__vo uint32_t CR;
+	__vo uint32_t CFGR;
+	__vo uint32_t CFGR2;
+	__vo uint32_t SMPR1;
+	__vo uint32_t SMPR2;
+	__vo uint32_t res0;
+	__vo uint32_t TR1;
+	__vo uint32_t TR2;
+	__vo uint32_t TR3;
+	__vo uint32_t SQR1;
+	__vo uint32_t SQR2;
+	__vo uint32_t SQR3;
+	__vo uint32_t SQR4;
+	__vo uint32_t DR;
+
+}ADC_RegDef_t;
+/*ADC COMMON register definiton*/
+typedef struct{
+	__vo uint32_t CSR;
+	uint32_t res0;
+	__vo uint32_t CCR;
+	__vo uint32_t CDR;
+}ADCOM_RegDef_t;
+
+/*Timer regiter definition*/
+typedef struct{
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t SMCR;
+	__vo uint32_t DIER;
+	__vo uint32_t SR;
+	__vo uint32_t EGR;
+	__vo uint32_t CCMR1;
+	__vo uint32_t CCMR2;
+	__vo uint32_t CCER;
+	__vo uint32_t CNT;
+	__vo uint32_t PSC;
+	__vo uint32_t ARR;
+	__vo uint32_t CCR1;
+	__vo uint32_t CCR2;
+	__vo uint32_t CCR3;
+	__vo uint32_t CCR4;
+
+}Tim_RegDef_t;
+
 /*GPIO peripheral definition*/
 #define GPIOA 						((GPIO_Regdef_t *)GPIOA_BASE_ADDR)
 #define GPIOB 						((GPIO_Regdef_t *)GPIOB_BASE_ADDR)
@@ -271,6 +321,12 @@ typedef struct{
 #define I2C1                         ((I2C_RegDef_t *)I2C1_BASE_ADDR)
 #define I2C2                         ((I2C_RegDef_t *)I2C2_BASE_ADDR)
 #define I2C3                         ((I2C_RegDef_t *)I2C3_BASE_ADDR)
+
+#define ADC1                         ((ADC_RegDef_t*)ADC_BASE_ADDR)
+#define ADCOM						 ((ADCOM_RegDef_t *)(ADC_BASE_ADDR+ 0X300UL))
+
+#define TIM2                         ((Tim_RegDef_t *)TIM2_BASE_ADDR)
+#define TIM3						 ((Tim_RegDef_t *)TIM3_BASE_ADDR)
 /*register mapping */
 
 /*clock enable for GPIO peripheral*/
@@ -469,8 +525,23 @@ typedef struct{
 
 #define NVIC_PR_BASE_ADDR  				( (__vo uint32_t *)  0xE000E400)
 #define NO_PR_BITS_IMPLEMENTED   		4
-
 /*NVIC configuration ends*/
+
+/*SYSTICK Congiguration*/
+
+//basee address of systick 
+#define SYSTICK_BASE_ADDR                0xE000E010
+
+/*systick register definiton*/
+typedef struct{
+	__vo uint32_t CSR;
+	__vo uint32_t RVR;
+	__vo uint32_t CVR;
+	__vo uint32_t CALIB;
+}Systick_RegDef_t;
+
+#define SysTick 						((Systick_RegDef_t *)SYSTICK_BASE_ADDR)
+
 
 #include"stm32l4xx_gpio_driver.h"
 //#include"stm32l4xx_usart_driver.h"
