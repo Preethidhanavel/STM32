@@ -95,7 +95,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer,uint32_t Len
 
     while (((pI2CHandle->pI2Cx->ISR >>15)&1));
 
-   
+
     uint32_t cr2 = 0;
     pI2CHandle->pI2Cx->CR2 |= (SlaveAddr << 1) |(Len << 16);
 
@@ -131,7 +131,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint8_t
 
     while (((pI2CHandle->pI2Cx->ISR >>15)&1)==0);
 
-    
+
     uint32_t cr2 = 0;
        cr2 |= (SlaveAddr << 1);
        cr2 |= (Len << 16);
@@ -161,6 +161,54 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint8_t
     {
         while (!(pI2CHandle->pI2Cx->ISR & (1<<6)));
     }
+}
+
+void I2C_BurstWrite(I2C_Handle_t *pI2CHandle, uint8_t SlaveAddr, uint8_t RegAddr, uint8_t *pData, uint32_t Len)
+{
+    uint8_t *buffer = malloc(Len + 1);  // 1 extra for RegAddr
+    if (!buffer)
+    	return;
+
+    buffer[0] = RegAddr;               // First byte: register address
+    memcpy(&buffer[1], pData, Len);    // Copy data after register
+
+    I2C_MasterSendData(pI2CHandle, buffer, Len + 1, SlaveAddr, I2C_DISABLE_SR);
+
+    free(buffer);
+}
+
+uint8_t I2C_BurstWriteIT(I2C_Handle_t *pI2CHandle, uint8_t SlaveAddr, uint8_t RegAddr, uint8_t *pData, uint32_t Len)
+{
+    uint8_t *buffer = malloc(Len + 1);
+    if (!buffer)
+    	return 1;
+
+    buffer[0] = RegAddr;
+    memcpy(&buffer[1], pData, Len);
+
+    uint8_t status = I2C_MasterSendDataIT(pI2CHandle, buffer, Len + 1, SlaveAddr, I2C_DISABLE_SR);
+
+    return status;
+}
+
+void I2C_BurstRead(I2C_Handle_t *pI2CHandle, uint8_t SlaveAddr, uint8_t RegAddr, uint8_t *pBuffer, uint32_t Len)
+{
+    // 1. Send register address
+    I2C_MasterSendData(pI2CHandle, &RegAddr, 1, SlaveAddr, I2C_ENABLE_SR);  // Repeated start
+
+    // 2. Receive the data
+    I2C_MasterReceiveData(pI2CHandle, pBuffer, Len, SlaveAddr, I2C_DISABLE_SR);
+}
+
+uint8_t I2C_BurstReadIT(I2C_Handle_t *pI2CHandle, uint8_t SlaveAddr, uint8_t RegAddr, uint8_t *pBuffer, uint32_t Len)
+{
+    // 1. Send register address with repeated start
+    uint8_t status = I2C_MasterSendDataIT(pI2CHandle, &RegAddr, 1, SlaveAddr, I2C_ENABLE_SR);
+
+    // 2. In the TX complete callback, initiate read
+    // So this function must return and let the event-driven system handle next step
+
+    return status;
 }
 
 void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
@@ -218,7 +266,7 @@ uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer, uint32
 		pI2CHandle->TxRxState = I2C_BUSY_IN_TX;
 		pI2CHandle->DevAddr = SlaveAddr;
 		pI2CHandle->Sr = Sr;
-		
+
 		 while (((pI2CHandle->pI2Cx->ISR >>15)&1)==0);
 		 uint32_t cr2 = 0;
 		       cr2 |= (SlaveAddr << 1);
@@ -247,7 +295,7 @@ uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer,uint
         pI2CHandle->RxSize    = Len;
         pI2CHandle->DevAddr   = SlaveAddr;
         pI2CHandle->Sr        = Sr;
-    
+
         pI2CHandle->pI2Cx->CR2 = 0;
         pI2CHandle->pI2Cx->CR2 |= (SlaveAddr << 1);
         pI2CHandle->pI2Cx->CR2 |= (Len << 16);
@@ -448,7 +496,6 @@ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle)
         I2C_ApplicationEventCallback(pI2CHandle, I2C_ERROR_TIMEOUT);
     }
 }
-
 
 
 

@@ -59,6 +59,11 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle,uint8_t *pTxbuffer, uint32_t Le
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer, uint8_t Len, uint8_t SlaveAddr,uint8_t Sr);
 uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pTxbuffer, uint32_t Len, uint8_t SlaveAddr,uint8_t Sr);
 uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer, uint8_t Len, uint8_t SlaveAddr,uint8_t Sr);
+void I2C_BurstWrite(I2C_Handle_t*, uint8_t slaveAddr, uint8_t regAddr, uint8_t *pData, uint32_t len);
+void I2C_BurstRead(I2C_Handle_t*, uint8_t slaveAddr, uint8_t regAddr, uint8_t *pData, uint32_t len);
+
+uint8_t I2C_BurstWriteIT(I2C_Handle_t*, uint8_t slaveAddr, uint8_t regAddr, uint8_t *pData, uint32_t len);
+uint8_t I2C_BurstReadIT(I2C_Handle_t*, uint8_t slaveAddr, uint8_t regAddr, uint8_t *pData, uint32_t len);
 
 void I2C_CloseReceiveData(I2C_Handle_t *pI2CHandle);
 void I2C_CloseSendData(I2C_Handle_t *pI2CHandle);
@@ -81,4 +86,5 @@ void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx);
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle,uint8_t AppEv);
 
 #endif /* INC_STM32L4XX_I2C_DRIVER_C_ */
+
 
