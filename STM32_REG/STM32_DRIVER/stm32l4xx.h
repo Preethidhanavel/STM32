@@ -259,7 +259,7 @@ typedef struct{
 	__vo uint32_t DR;
 
 }ADC_RegDef_t;
-/*ADC COMMON register definiton*/
+
 typedef struct{
 	__vo uint32_t CSR;
 	uint32_t res0;
@@ -267,7 +267,6 @@ typedef struct{
 	__vo uint32_t CDR;
 }ADCOM_RegDef_t;
 
-/*Timer regiter definition*/
 typedef struct{
 	__vo uint32_t CR1;
 	__vo uint32_t CR2;
@@ -288,6 +287,21 @@ typedef struct{
 
 }Tim_RegDef_t;
 
+typedef struct{
+	__vo uint32_t CCR;
+	__vo uint32_t CNDTR;
+	__vo uint32_t CPAR;
+	__vo uint32_t CMAR;
+}DMA1_RegDef_t;
+
+typedef struct{
+	__vo uint32_t CSELR;
+}DMA1_CSELR_RegDef_t;
+
+typedef struct{
+	__vo uint32_t ISR;
+	__vo uint32_t IFCR;
+}DMA_RegDef_t;
 /*GPIO peripheral definition*/
 #define GPIOA 						((GPIO_Regdef_t *)GPIOA_BASE_ADDR)
 #define GPIOB 						((GPIO_Regdef_t *)GPIOB_BASE_ADDR)
@@ -323,10 +337,17 @@ typedef struct{
 #define I2C3                         ((I2C_RegDef_t *)I2C3_BASE_ADDR)
 
 #define ADC1                         ((ADC_RegDef_t*)ADC_BASE_ADDR)
-#define ADCOM						 ((ADCOM_RegDef_t *)(ADC_BASE_ADDR+ 0X300UL))
+#define ADCOM						 ((ADCOM_RegDef_t *)(ADC_BASE_ADDR + 0X300UL))
 
 #define TIM2                         ((Tim_RegDef_t *)TIM2_BASE_ADDR)
 #define TIM3						 ((Tim_RegDef_t *)TIM3_BASE_ADDR)
+
+#define DMA1_Channel7				 ((DMA1_RegDef_t *)(DMA1_BASE_ADDR + 0X080))
+#define DMA1_CSELR					 ((DMA1_CSELR_RegDef_t *)(DMA1_BASE_ADDR + 0XA8))
+
+#define DMA1_Channel6				 ((DMA1_RegDef_t *)(DMA1_BASE_ADDR + 0X6C))
+
+#define DMA1					     ((DMA_RegDef_t *)DMA1_BASE_ADDR)
 /*register mapping */
 
 /*clock enable for GPIO peripheral*/
@@ -525,14 +546,9 @@ typedef struct{
 
 #define NVIC_PR_BASE_ADDR  				( (__vo uint32_t *)  0xE000E400)
 #define NO_PR_BITS_IMPLEMENTED   		4
-/*NVIC configuration ends*/
 
-/*SYSTICK Congiguration*/
-
-//basee address of systick 
 #define SYSTICK_BASE_ADDR                0xE000E010
 
-/*systick register definiton*/
 typedef struct{
 	__vo uint32_t CSR;
 	__vo uint32_t RVR;
@@ -541,7 +557,7 @@ typedef struct{
 }Systick_RegDef_t;
 
 #define SysTick 						((Systick_RegDef_t *)SYSTICK_BASE_ADDR)
-
+/*NVIC configuration ends*/
 
 #include"stm32l4xx_gpio_driver.h"
 //#include"stm32l4xx_usart_driver.h"
